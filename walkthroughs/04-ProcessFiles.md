@@ -48,7 +48,14 @@ With everything processed, the Excel data should now be fully imported into Cosm
 
 1. Open the data explorer in Cosmos DB and review the data
 
+    !["The data should be available in your cosmos db now"](./images/image0023-dataispresentfromfile.png)  
 
+## Rinse and Repeat
 
-## Rinse and Re
+Feel free to upload the file again (you will get duplicates since the id is generated and is different for each load, and no prevention of duplicates is in place on the Title).  Feel free to change the data and upload and you'll get the expected results when data is unique.
 
+## Conclusion
+
+This is the end of the first part of the workshop.  You now have the basic tools to understand how to easily create and wire up events for responding to blob storage with an Azure function.  In this specific example, you learned how to then get the blob and parse it as an Excel file to put the data into CosmosDB.  There are many other ways you can utilize this process, of course.
+
+In the final walkthrough (which is optional), you can see a more manual approach to this same type of operation.
