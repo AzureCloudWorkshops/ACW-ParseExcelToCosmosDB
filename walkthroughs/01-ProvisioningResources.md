@@ -96,5 +96,17 @@ Then run the command:
 
 ```bash
 bash ./deployall.sh
-```  
+``` 
+
+This will complete the deployment.  Assuming there are no errors, you can move on to the second walkthrough.  You may also choose to review the manual deployments list below to ensure your resources were deployed by the templates as expected.  
+
+## Manual Deployments
+
+If you don't use the script, you will need to complete the following deployments manually
+
+1. Create an Azure Storage Account with a container for uploads  
+
+1. Create an Azure Function app in the consumption tier, including the hosting plan and the backing storage account (do not use the same storage account as for the uploads)
+
+1. Create a cosmos db in the free tier.  Create a database in the Cosmos DB Account named `moviesdb` with two containers `moviestowatch` and `watchedmovies`.  
 
