@@ -65,6 +65,18 @@ param runtime string = 'dotnet'
 param fnAppName string = 'DataProcessingFunctions${uniqueString(resourceGroup().id)}'
 
 
+@description('Cosmos DB account name')
+param accountName string = 'moviesDB-${uniqueString(resourceGroup().id)}'
+
+@description('The name for the SQL API database')
+param databaseName string = 'moviesdb'
+
+@description('Container for watched movies')
+param watchedMovies string = 'watchedmovies'
+@description('Container for movies to watch')
+param moviesToWatchContainer string = 'moviestowatch'
+
+
 module fileUploadsStorageModule 'azureDeployStorage.bicep' = {
   name: 'storageDeploy'
   params: {
@@ -97,6 +109,9 @@ module deployCosmosModule 'azuredeploycosmos.bicep' = {
   name: 'deployCosmosDBFreeTier'
   params: {
     location:location
+    accountName: accountName
+    databaseName: databaseName
+    moviesToWatchContainer: moviesToWatchContainer
+    watchedMovies: watchedMovies
   }
-
 }
