@@ -104,9 +104,16 @@ This will complete the deployment.  Assuming there are no errors, you can move o
 
 If you don't use the script, you will need to complete the following deployments manually
 
-1. Create an Azure Storage Account with a container for uploads  
+1. Create an Azure Storage Account with a container for uploads.
 
-1. Create an Azure Function app in the consumption tier, including the hosting plan and the backing storage account (do not use the same storage account as for the uploads)
+    A suggested name is something like `fileuploads` with unique characters after it like your intials and the date (i.e. `fileuploadsabc20291231`)
+
+1. Create an Azure Function app in the consumption tier, including the hosting plan and the backing storage account (do not use the same storage account as for the uploads).  The Azure function app will also have an application insights associated to it but that won't be utilized in this workshop.
+
+    You should have a function app named something like `DataProcessingFunctionsABC20291231`.  You should also see the app service plan, application insights, and the backing storage for the function app.
 
 1. Create a cosmos db in the free tier.  Create a database in the Cosmos DB Account named `moviesdb` with two containers `moviestowatch` and `watchedmovies`.  
 
+    Finally, you should have a cosmos db deployed, and within the db account, you would have a database with two containers.
+
+!["deployed resources are shown"](./images/0003-deployedresources.png)  

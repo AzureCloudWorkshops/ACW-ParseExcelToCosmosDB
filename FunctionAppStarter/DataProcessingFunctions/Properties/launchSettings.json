@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "DataProcessingFunctions": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7297",
+      "launchBrowser": false
+    }
+  }
+}

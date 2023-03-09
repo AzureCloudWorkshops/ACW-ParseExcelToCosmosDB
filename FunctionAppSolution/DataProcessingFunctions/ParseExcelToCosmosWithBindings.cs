@@ -19,8 +19,8 @@ namespace DataProcessingFunctions
                 [Blob(blobPath: "{data.url}", access: FileAccess.Read,
                     Connection = "uploadsStorageConnection")] Stream fileToProcess,
                 [CosmosDB(
-                    databaseName: "MoviesDB",
-                    collectionName: "WatchedMovies",
+                    databaseName: "moviesdb",
+                    collectionName: "watchedmovies",
                     ConnectionStringSetting = "CosmosMoviesDBConnection")]
                     IAsyncCollector<Movie> movieDocuments,
                 ILogger log)
