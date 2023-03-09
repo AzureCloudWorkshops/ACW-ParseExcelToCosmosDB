@@ -75,12 +75,26 @@ git clone https://github.com/AzureCloudWorkshops/ACW-ParseExcelToCosmosDB.git
 
 1. Deploy All
 
-
-
-
-then navigate to the templates folder and then run the command:
+After Cloning, navigate to the templates folder 
 
 ```bash
-bash .\azuredeployall.sh
+cd ACW-ParseExcelToCosmosDB
+cd templates
+```  
+
+If you want to review/make changes, run
+
+```bash
+code  .
+```  
+
+Which opens the files for review in the cloud shell.  You can also use this to change any parameters or change the scripts to override defaults on parameters.
+
+!["Review the templates and scripts](./images/0002-reviewtemplates.png)
+
+Then run the command:
+
+```bash
+bash ./deployall.sh
 ```  
 

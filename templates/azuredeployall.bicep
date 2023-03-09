@@ -77,7 +77,7 @@ param watchedMovies string = 'watchedmovies'
 param moviesToWatchContainer string = 'moviestowatch'
 
 
-module fileUploadsStorageModule 'azureDeployStorage.bicep' = {
+module fileUploadsStorageModule 'azuredeploystorage.bicep' = {
   name: 'storageDeploy'
   params: {
     location: location
