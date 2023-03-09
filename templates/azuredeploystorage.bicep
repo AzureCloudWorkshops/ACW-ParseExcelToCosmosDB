@@ -36,6 +36,14 @@ param storageTier string = 'Hot'
 @description('Enable blob encryption at rest')
 param blobEncryptionEnabled bool = true
 
+@description('Enable Blob Retention')
+param enableBlobRetention bool = false
+@description('Number of days to retain blobs')
+param blobRetentionDays int = 7
+
+@description('The name of the container in which to store uploads')
+param containerName string = 'uploads'
+
 @description('The storage account.  Toggle the public access to true if you want public blobs on the account in any containers')
 resource storageaccount 'Microsoft.Storage/storageAccounts@2021-02-01' = {
   name: storageAccountName
@@ -59,9 +67,6 @@ resource storageaccount 'Microsoft.Storage/storageAccounts@2021-02-01' = {
   }
 }
 
-param enableBlobRetention bool = false
-param blobRetentionDays int = 7
-
 resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2021-04-01' = {
   parent: storageaccount
   name: 'default'
@@ -72,9 +77,6 @@ resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2021-04-01
     }
   }
 }
-
-@description('The name of the container in which to store uploads')
-param containerName string = 'uploads'
 
 // Create the uploads container
 resource uploadsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
