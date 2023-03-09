@@ -54,3 +54,6 @@ Further orchestration such as sending an email or another path with the Logic Ap
 
 Should you run into problems, please open an issue on this repository.
 
+## Getting Started
+
+Proceed to the walkthroughs to provision resources and explore services for this learning workshop.
