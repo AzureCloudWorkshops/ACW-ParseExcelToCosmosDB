@@ -49,7 +49,7 @@ resource container 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/container
       id: watchedMovies
       partitionKey: {
         paths: [
-          '/title'
+          '/Title'
         ]
         kind: 'Hash'
       }
@@ -78,7 +78,7 @@ resource moviesToWatch 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/conta
       id: moviesToWatchContainer
       partitionKey: {
         paths: [
-          '/title'
+          '/Title'
         ]
         kind: 'Hash'
       }

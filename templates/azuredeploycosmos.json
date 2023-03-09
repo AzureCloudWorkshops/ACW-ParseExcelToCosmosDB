@@ -86,7 +86,7 @@
           "id": "[parameters('watchedMovies')]",
           "partitionKey": {
             "paths": [
-              "/title"
+              "/Title"
             ],
             "kind": "Hash"
           },
@@ -118,7 +118,7 @@
           "id": "[parameters('moviesToWatchContainer')]",
           "partitionKey": {
             "paths": [
-              "/title"
+              "/Title"
             ],
             "kind": "Hash"
           },
