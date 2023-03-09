@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 
 namespace DataProcessingFunctions
 {
+    /*Use an HTTP trigger and launch via postman, web event click with AJAX Post, or Logic App */
     public static class ParseExcelToCosmosWithSDK
     {
         [FunctionName("ParseExcelToCosmosWithSDK")]

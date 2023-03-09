@@ -1,10 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <AzureFunctionsVersion>v4</AzureFunctionsVersion>
+    <TargetFramework>$(TargetFrameworkVersion)</TargetFramework>
+    <AzureFunctionsVersion>$(AzureFunctionsVersion)</AzureFunctionsVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.1.1" />
+    <PackageReference Include="DocumentFormat.OpenXml" Version="$(OpenXMLVersion)" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.CosmosDB" Version="$(WebJobsExtensionsCosmosDBVersion)" />
+	<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventGrid" Version="$(WebJobsExtensionsEventGridVersion)" />
+	<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="$(WebJobsExtensionsStorageVersion)" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="$(NETSdkFunctionsVersion)" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">
