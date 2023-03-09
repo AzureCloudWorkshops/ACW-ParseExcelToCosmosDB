@@ -11,9 +11,9 @@ using Newtonsoft.Json;
 namespace DataProcessingFunctions
 {
     /*Use an HTTP trigger and launch via postman, web event click with AJAX Post, or Logic App */
-    public static class ParseExcelToCosmosWithSDK
+    public static class ParseExcelToCosmosWithSDKs
     {
-        [FunctionName("ParseExcelToCosmosWithSDK")]
+        [FunctionName("ParseExcelToCosmosWithSDKs")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
@@ -29,6 +29,14 @@ namespace DataProcessingFunctions
             string responseMessage = string.IsNullOrEmpty(url)
                 ? "This HTTP triggered function executed successfully. Pass a url in the query string or in the request body for a personalized response."
                 : $"Processing file from {url}...";
+
+
+            //TODO:
+            //Interface with Storage SDK to get data by URL/keys from Azure Storage
+
+            //Parse the file after downloading from storage
+
+            //Interface with Cosmos DB to manually push the documents into Cosmos
 
             return new OkObjectResult(responseMessage);
         }

@@ -22,7 +22,7 @@ namespace DataProcessingFunctions
                     databaseName: "MoviesDB",
                     collectionName: "WatchedMovies",
                     ConnectionStringSetting = "CosmosMoviesDBConnection")]
-                    IAsyncCollector<Movie> sampleDataItemDocuments,
+                    IAsyncCollector<Movie> movieDocuments,
                 ILogger log)
         {
             log.LogInformation(eventGridEvent.Data.ToString());
@@ -43,7 +43,7 @@ namespace DataProcessingFunctions
                 foreach (var movie in parseResults)
                 {
                     log.LogInformation($"Adding {movie.Title} to cosmos db output documents");
-                    await sampleDataItemDocuments.AddAsync(movie);
+                    await movieDocuments.AddAsync(movie);
                 }
             }
         }
