@@ -348,3 +348,6 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+/FunctionAppSolution/DataProcessingFunctions/DataProcessingFunctions/Properties/ServiceDependencies/DataProcessingFunctionso72mcy566quke - Zip Deploy/storage1.arm.json
+/FunctionAppSolution/DataProcessingFunctions/DataProcessingFunctions/Properties/ServiceDependencies/DataProcessingFunctionso72mcy566quke - Zip Deploy/appInsights1.arm.json
+/FunctionAppSolution/DataProcessingFunctions/DataProcessingFunctions/Properties/serviceDependencies.DataProcessingFunctionso72mcy566quke - Zip Deploy.json
