@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.9.1.41621",
-      "templateHash": "4267925180489767020"
+      "templateHash": "7228340904140604656"
     }
   },
   "parameters": {
@@ -88,11 +88,18 @@
         "description": "Number of days to retain blobs"
       }
     },
-    "containerName": {
+    "watchedMoviesContainer": {
       "type": "string",
-      "defaultValue": "uploads",
+      "defaultValue": "watchedmovies",
       "metadata": {
-        "description": "The name of the container in which to store uploads"
+        "description": "The name of the container in which to upload watched movies"
+      }
+    },
+    "moviesToWatchContainer": {
+      "type": "string",
+      "defaultValue": "moviestowatch",
+      "metadata": {
+        "description": "The name of the container in which to upload movies to watch"
       }
     }
   },
@@ -143,7 +150,22 @@
     {
       "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
       "apiVersion": "2022-09-01",
-      "name": "[format('{0}/{1}/{2}', variables('storageAccountName'), 'default', parameters('containerName'))]",
+      "name": "[format('{0}/{1}/{2}', variables('storageAccountName'), 'default', parameters('watchedMoviesContainer'))]",
+      "properties": {
+        "immutableStorageWithVersioning": {
+          "enabled": false
+        },
+        "metadata": {},
+        "publicAccess": "None"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts/blobServices', variables('storageAccountName'), 'default')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+      "apiVersion": "2022-09-01",
+      "name": "[format('{0}/{1}/{2}', variables('storageAccountName'), 'default', parameters('moviesToWatchContainer'))]",
       "properties": {
         "immutableStorageWithVersioning": {
           "enabled": false

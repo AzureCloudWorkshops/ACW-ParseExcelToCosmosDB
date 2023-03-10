@@ -6,4 +6,9 @@ Because logic apps are low-code, you'll need to leverage an Azure Function to wo
 
 In this example, you will not use any input and output bindings.  Instead, in this example, you'll build manual code to connect to each service and interact via the Azure SDKs for each service (Blob Storage and Cosmos DB).  
 
-## 
+## Gather information/Deploy Resources
+
+Assuming you have completed the other parts of this workshop, you should already have the following resources ready to go:
+
+- A storage account for file uploads
+- 

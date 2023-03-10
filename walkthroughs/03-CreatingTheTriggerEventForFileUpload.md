@@ -74,6 +74,10 @@ Navigate to your Azure Storage Account for uploads.  In that account, at the acc
 
     !["Events are wired up with a subscription"](./images/image0018-respondingtofileuploads.png)  
 
+## Add a filter
+
+Optionally, if you want to ensure that this event is only triggered when files are uploaded to a specific container, you can do this.
+
 ## Conclusion
 
 You've now gotten the event subscription wired up and the last step is to test the solution and see how it responds to the event and processes the files.

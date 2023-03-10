@@ -41,8 +41,11 @@ param enableBlobRetention bool = false
 @description('Number of days to retain blobs')
 param blobRetentionDays int = 7
 
-@description('The name of the container in which to store uploads')
-param containerName string = 'uploads'
+@description('The name of the container in which to upload watched movies')
+param watchedMoviesContainer string = 'watchedmovies'
+
+@description('The name of the container in which to upload movies to watch')
+param moviesToWatchContainer string = 'moviestowatch'
 
 @description('The storage account.  Toggle the public access to true if you want public blobs on the account in any containers')
 resource storageaccount 'Microsoft.Storage/storageAccounts@2021-02-01' = {
@@ -78,9 +81,22 @@ resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2021-04-01
   }
 }
 
-// Create the uploads container
-resource uploadsContainer 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
-  name: containerName
+// Create the watchedmovies container
+resource watchedMovies 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
+  name: watchedMoviesContainer
+  parent: blobServices
+  properties: {
+    immutableStorageWithVersioning: {
+      enabled: false
+    }
+    metadata: {}
+    publicAccess: 'None'
+  }
+}
+
+// Create the watchedmovies container
+resource moviesToWatch 'Microsoft.Storage/storageAccounts/blobServices/containers@2022-09-01' = {
+  name: moviesToWatchContainer
   parent: blobServices
   properties: {
     immutableStorageWithVersioning: {

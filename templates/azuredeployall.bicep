@@ -41,8 +41,11 @@ param enableBlobRetention bool = false
 @description('Number of days to retain blobs')
 param blobRetentionDays int = 7
 
-@description('The name of the container in which to store uploads')
-param containerName string = 'uploads'
+@description('The name of the container in which to upload watched movies')
+param watchedMoviesStorageContainer string = 'watchedmovies'
+
+@description('The name of the container in which to upload movies to watch')
+param moviesToWatchStorageContainer string = 'moviestowatch'
 
 @minLength(3)
 @maxLength(16)
@@ -71,9 +74,9 @@ param accountName string = 'moviesDB-${uniqueString(resourceGroup().id)}'
 @description('The name for the SQL API database')
 param databaseName string = 'moviesdb'
 
-@description('Container for watched movies')
+@description('Cosmos Container for watched movies')
 param watchedMovies string = 'watchedmovies'
-@description('Container for movies to watch')
+@description('Cosmos Container for movies to watch')
 param moviesToWatchContainer string = 'moviestowatch'
 
 
@@ -87,7 +90,8 @@ module fileUploadsStorageModule 'azuredeploystorage.bicep' = {
     blobEncryptionEnabled: blobEncryptionEnabled
     enableBlobRetention: enableBlobRetention
     blobRetentionDays: blobRetentionDays
-    containerName: containerName
+    watchedMoviesContainer: watchedMoviesStorageContainer
+    moviesToWatchContainer: moviesToWatchStorageContainer
     allowBlobPublicAccess: allowBlobPublicAccess
     allowSharedKeyAccess: allowSharedKeyAccess
   }

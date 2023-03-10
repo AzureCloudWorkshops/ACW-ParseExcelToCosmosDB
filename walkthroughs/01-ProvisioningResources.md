@@ -71,7 +71,7 @@ Clone the repo
 git clone https://github.com/AzureCloudWorkshops/ACW-ParseExcelToCosmosDB.git
 ```  
 
-!["Get the code to your cloud shell"](./images/0001-getthecodeincloudshell.png)  
+!["Get the code to your cloud shell"](./images/Walkthrough01/image0001-getthecodeincloudshell.png)  
 
 1. Deploy All
 
@@ -90,7 +90,7 @@ code  .
 
 Which opens the files for review in the cloud shell.  You can also use this to change any parameters or change the scripts to override defaults on parameters.
 
-!["Review the templates and scripts](./images/0002-reviewtemplates.png)
+!["Review the templates and scripts](./images/Walkthrough01/image0002-reviewtemplates.png)  
 
 Then run the command:
 
@@ -104,9 +104,14 @@ This will complete the deployment.  Assuming there are no errors, you can move o
 
 If you don't use the script, you will need to complete the following deployments manually
 
-1. Create an Azure Storage Account with a container for uploads.
+1. Create an Azure Storage Account with two containers for file uploads.
 
     A suggested name is something like `fileuploads` with unique characters after it like your intials and the date (i.e. `fileuploadsabc20291231`)
+
+    Container suggested names are:
+
+    - moviestowatch
+    - watchedmovies
 
 1. Create an Azure Function app in the consumption tier, including the hosting plan and the backing storage account (do not use the same storage account as for the uploads).  The Azure function app will also have an application insights associated to it but that won't be utilized in this workshop.
 
@@ -116,4 +121,8 @@ If you don't use the script, you will need to complete the following deployments
 
     Finally, you should have a cosmos db deployed, and within the db account, you would have a database with two containers.
 
-!["deployed resources are shown"](./images/0003-deployedresources.png)  
+    - database: moviesdb
+    - container: moviesdb -> moviestowatch
+    - container: moviesdb -> watchedmovies
+
+!["deployed resources are shown"](./images/Walkthrough01/image0003-deployedresources.png)   

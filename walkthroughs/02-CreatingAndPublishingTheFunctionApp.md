@@ -16,23 +16,23 @@ To get started, copy the starter files to a working location on your machine and
 
     - right-click on the project and select `Publish`
 
-        !["start building the publish profile"](./images/image0004-publishfunctionapp.png)  
+        !["start building the publish profile"](./images/Walkthrough02/image0001-publishfunctionapp.png)  
 
     - select `Add a publish profile`, then select `Azure`. 
     
-        !["select add a publish profile and then azure"](./images/0005-creatingpublishprofile.png)  
+        !["select add a publish profile and then azure"](./images/Walkthrough02/image0002-creatingpublishprofile.png)  
 
     - select `Azure Function App (Windows)`
 
-        !["Azure Function App (Windows)"](./images/0006-AzureFunctionAppWindows.png)  
+        !["Azure Function App (Windows)"](./images/Walkthrough02/image0003-AzureFunctionAppWindows.png)  
 
     - Make sure you are signed in to your account, then select the function app to deploy your solution, then finish the deployment
 
-        !["Select the target function app and finish the deployment."](./images/0007-selectthetargetfunctionapp.png)
+        !["Select the target function app and finish the deployment."](./images/Walkthrough02/image0004-selectthetargetfunctionapp.png)
 
     - Make sure to then hit the `Publish` option to push the code to Azure
 
-        !["Publish the app"](./images/0008-presspublishtodeploy.png)  
+        !["Publish the app"](./images/Walkthrough02/image0005-presspublishtodeploy.png)  
 
 1. While the app deploys, review the code for the `ParseExcelToCosmosWithBindings` function
 
@@ -84,7 +84,7 @@ To complete the deployment a couple of configuration settings need to be put int
 
     Navigate in the portal to get your storage account connection string, which is found under the storage account in the `Access Keys` blade.  Copy the connection string to your clipboard:
 
-    !["get the storage connection string"](./images/0009-storageconnectionstring.png)  
+    !["get the storage connection string"](./images/Walkthrough02/image0006-storageconnectionstring.png)  
 
     Once you have the connection string, navigate in another window/tab to the function app and select the `Configuration` blade.  On the configuration blade, select `+ New Application Setting` and add a new setting with the name as follows:
 
@@ -94,7 +94,7 @@ To complete the deployment a couple of configuration settings need to be put int
 
     Set the value to the connection string copied from the storage account.  Note that the name is the same name as the connection from the Blob Storage binding in the code above.
 
-    !["Create the storage connection setting"](./images/0010-storageconnectionstring.png)  
+    !["Create the storage connection setting"](./images/Walkthrough02/image0007-storageconnectionstring.png)  
 
     Press ok, then save and continue (three clicks total to save changes). 
 
@@ -102,7 +102,7 @@ To complete the deployment a couple of configuration settings need to be put int
 
     Just like the storage connection string, the binding needs to be set for the cosmos db connection string.  Navigate to your cosmos db account and get the connection string from the `Keys` blade:
 
-    !["Getting the connection string for the cosmos db account"](./images/0011-cosmosconnectionstring.png)  
+    !["Getting the connection string for the cosmos db account"](./images/Walkthrough02/image0008-cosmosconnectionstring.png)  
 
     Copy the connection string to your clipboard, then repeat the steps to create a new configuration application setting on the Azure Function App named:
 
@@ -112,7 +112,7 @@ To complete the deployment a couple of configuration settings need to be put int
 
     Set the value to the connection string for the Cosmos DB Account
 
-    !["setting the connection string for the cosmosdb"](./images/image0012-configurationforthecosmosdbconnectionstring.png)  
+    !["setting the connection string for the cosmosdb"](./images/Walkthrough02/image0009-configurationforthecosmosdbconnectionstring.png)  
 
 1. The Function App is now configured
 
@@ -122,7 +122,7 @@ To complete the deployment a couple of configuration settings need to be put int
 
     Once in the function, click on `Integration` to see the bindings.  Unfortunately, by default they don't show their direction, so they show up as unknown.  That is ok, they will still work:
 
-    !["unknown binding directions for blog storage and cosmos db but they are known bindings"](./images/image0013-bindingdirectionnotset.png)  
+    !["unknown binding directions for blog storage and cosmos db but they are known bindings"](./images/Walkthrough02/image0010-bindingdirectionnotset.png)  
 
 ## Examine remaining code
 
