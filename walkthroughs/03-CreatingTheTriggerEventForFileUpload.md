@@ -91,10 +91,10 @@ Optionally, if you want to ensure that this event is only triggered when files a
     In the form that appears, enter
 
     ```text
-    /watchedmovies
+    /blobServices/default/containers/watchedmovies
     ```  
 
-    This must match the `container` to which you are going to upload the excel file.  If you don't get this right, nothing will trigger.
+    This must match the pattern of `/blobServices/default/containers/your-specific-container` to which you are going to upload the excel file.  If you don't get this right, nothing will trigger.
 
     For the `subject ends with` enter the extension for excel:
 
@@ -106,7 +106,7 @@ Optionally, if you want to ensure that this event is only triggered when files a
 
     !["Applying the filters to prevent triggering the function except when desired"](./images/Walkthrough03/image0007-applyingfilters.png)  
 
-    >**Note:** Don't forget to save the changes
+    >**Note:** Don't forget to save the changes!
 
 ## Conclusion
 
