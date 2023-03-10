@@ -15,22 +15,26 @@ namespace DataProcessingFunctions
     {
         [FunctionName("ParseExcelToCosmosWithSDKs")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            log.LogInformation("ParseExcelToCosmosWithSDKs Started");
 
-            string url = req.Query["blobURI"];
+            //get the blob url from query string or body (should be body)
+            string url = req.Query["url"];
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             dynamic data = JsonConvert.DeserializeObject(requestBody);
-            url = url ?? data?.blobURI;
+            url = url ?? data?.url;
 
-            string responseMessage = string.IsNullOrEmpty(url)
-                ? "This HTTP triggered function executed successfully. Pass a url in the query string or in the request body for a personalized response."
-                : $"Processing file from {url}...";
-
-
+            if (string.IsNullOrWhiteSpace(url))
+            {
+                log.LogError("Cannot proceed without a URL");
+                throw new Exception("No URL Provided");
+            }
+            
+            log.LogInformation($"Processing file from {url}...");
+            
             //TODO:
             //Interface with Storage SDK to get data by URL/keys from Azure Storage
 
@@ -38,7 +42,7 @@ namespace DataProcessingFunctions
 
             //Interface with Cosmos DB to manually push the documents into Cosmos
 
-            return new OkObjectResult(responseMessage);
+            return new OkObjectResult("Processing of movies to watch is completed");
         }
     }
 }

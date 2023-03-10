@@ -54,7 +54,7 @@ The connection string for the Storage Account should already be available via th
 
     If you want to test locally, add a user secret for `uploadsStorageConnection` and set the value to the same connection string used in the previous work to connect to the storage account.
 
-    Add a new class into the Function App called `BlobStorageInterop.cs`.  In the class, add the following code:
+    Create a new folder into the Function App called `BlobStorage` and place a new class called `BlobStorageInterop.cs`.  In the class, add the following code:
 
     ```c#
     private readonly BlobServiceClient _blobServiceClient;
@@ -91,14 +91,116 @@ The connection string for the Storage Account should already be available via th
 
     >**Note:** This client will only get blobs, not upload them, but you could use this logic as a starter to learn more about working with Blob Storage via the SDK if you so desired.
 
-    Additionally Note:
+    Additional Note:
 
     >**Note:** There is no testing here.  If you are concerned about testing, you could create a simple console app and leverage the code to see it working rather than try to shoehorn code into a function app before you are certain that it works.
 
+    Finally, you could just wire this up in the function and avoid the double memory stream byte array jazz.  I moved it to the interop/helper file so that it could potentially be reused.
+
 1. Add the Azure Blob Storage library
 
-    To make this code work, you must have the NuGet Package `Azure.Storage.Blobs`.  Make sure to import that package into your project.
+    To make this code work, you need to have the NuGet Package `Azure.Storage.Blobs`.  Make sure to import that package into your project if it's not already there.
+
+1. Add a function to get the blob
+
+    The blob URL is passed in, so getting the blob name will require a bit of string manipulation.  Additionally, the connection string needs to be pulled from the configuration.  Add a function to interact with the Blob Storage that can be called from the processing function (added as a new private static method in the same class)
+
+    ```cs
+    /// <summary>
+    /// Get the file from blob storage
+    /// </summary>
+    /// <param name="url">The URL of the blob</param>
+    /// <param name="log">The Logger for the function</param>
+    /// <returns>byte[] containing the file contendts</returns>
+    /// <exception cref="Exception">throws exception if any part is bad</exception>
+    private static byte[] GetFileToParse(string url, ILogger log)
+    {
+        var cnstr = Environment.GetEnvironmentVariable("uploadsStorageConnection");
+        if (string.IsNullOrWhiteSpace(cnstr))
+        {
+            log.LogError("Connection string value is not set as expected");
+            throw new Exception("Error: Connection string not set or is incorrect");
+        }
+        var bsi = new BlobStorageInterop(cnstr);
+
+        //get the storage container for uploads
+        var containerName = Environment.GetEnvironmentVariable("uploadsStorageContainer");
+        if (string.IsNullOrWhiteSpace(containerName))
+        {
+            log.LogError("Container name value is not set as expected");
+            throw new Exception("Error: Container Name is not set");
+        }
+
+        //Parse the file after downloading from storage
+        var keyText = $@"/{containerName}/";
+        var blobNameStart = url.IndexOf(keyText);
+        var blobName = url.Substring(blobNameStart + keyText.Length + 1);
+        if (string.IsNullOrWhiteSpace(blobName))
+        {
+            log.LogError("Blob Name not found");
+            throw new Exception("Error: Indeterminant blob name");
+        }
+
+        //get the blob 
+        var fileToParseBytes = bsi.GetBlob(containerName, blobName);
+        if (fileToParseBytes == null || fileToParseBytes.Length == 0)
+        {
+            log.LogError("File Not found");
+            throw new Exception($"Error: Blob {blobName} in container {containerName} returned 0 bytes");
+        }
+
+        return fileToParseBytes;
+    }
+    ```  
+
+    Once the method is in place, add a simple command to the main processor function to get the file bytes:
+
+    ```cs
+    //Interface with Storage SDK to get data by URL/keys from Azure Storage
+    var fileToParse = GetFileToParse(url, log);
+    ```  
+
+1. Parse the file.
+
+    The code to parse the file is already in place.  Make a call similar to the way the bindings function called to the parsefile to parse the byte[] and create a list of movie objects:
+
+    ```cs
+    //Parse the file after downloading from storage
+    List<Movie> moviesToWatch = new List<Movie>();
+    using (var ms = new MemoryStream(fileToParse))
+    {
+        log.LogInformation("Parsing file..");
+        var parseResults = ParseFile.ParseDataFile(ms);
+        foreach (var movie in parseResults)
+        {
+            log.LogInformation($"Adding {movie.Title} to list of movies");
+            moviesToWatch.Add(movie);
+        }
+    }
+    ```  
+
+    The movies list will then be able to be processed into the Cosmos DB database.
 
 1. Get the parsed data into Comsos DB
 
-    For this next code, you'll put the code into Cosmos DB
+    For this next code, you'll put the code into Cosmos DB.  Start by creating a method to upsert each movie into the correct container:
+
+    ```cs
+
+    ```
+
+    Finish this operation by making a call to the method to process all the movies
+
+    ```cs
+    //Interface with Cosmos DB to manually push the documents into Cosmos
+    ProcessMoviesToWatch(moviesToWatch, log);
+    ```  
+
+1. Add the missing container information to the function app
+
+    In the code above, two settings were leveraged, and they need to be added to the function app
+
+    - `uploadsStorageContainer`: The name of the storage container where you are uploading files (i.e. `moviestowatch`)
+    - `cosmosMoviesToWatchContainer`: The name of the container in cosmos db where you want to push data (i.e. `moviestowatch`)
+
+    !["Make sure to add the configuration settings"](./images/Walkthrough05/image0001x-configurationsettings.png)  
