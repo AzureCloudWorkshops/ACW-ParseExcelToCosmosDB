@@ -4,10 +4,12 @@
     <AzureFunctionsVersion>$(AzureFunctionsVersion)</AzureFunctionsVersion>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Azure.Storage.Blobs" Version="$(AzureStorageBlobsVersion)" />
     <PackageReference Include="DocumentFormat.OpenXml" Version="$(OpenXMLVersion)" />
+    <PackageReference Include="Microsoft.Azure.Cosmos" Version="$(CosmosDBVersion)"
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.CosmosDB" Version="$(WebJobsExtensionsCosmosDBVersion)" />
-	<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventGrid" Version="$(WebJobsExtensionsEventGridVersion)" />
-	<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="$(WebJobsExtensionsStorageVersion)" />
+	  <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.EventGrid" Version="$(WebJobsExtensionsEventGridVersion)" />
+	  <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="$(WebJobsExtensionsStorageVersion)" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="$(NETSdkFunctionsVersion)" />
   </ItemGroup>
   <ItemGroup>

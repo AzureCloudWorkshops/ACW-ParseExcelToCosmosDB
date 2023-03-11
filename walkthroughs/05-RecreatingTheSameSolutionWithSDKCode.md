@@ -160,6 +160,8 @@ The connection string for the Storage Account should already be available via th
     var fileToParse = GetFileToParse(url, log);
     ```  
 
+    >**Reminder:** If you are uncertain about the code as per above, review the solution files in the repository.
+
 1. Parse the file.
 
     The code to parse the file is already in place.  Make a call similar to the way the bindings function called to the parsefile to parse the byte[] and create a list of movie objects:
@@ -181,12 +183,87 @@ The connection string for the Storage Account should already be available via th
 
     The movies list will then be able to be processed into the Cosmos DB database.
 
-1. Get the parsed data into Comsos DB
+1. Add the Cosmos DB Interop
 
-    For this next code, you'll put the code into Cosmos DB.  Start by creating a method to upsert each movie into the correct container:
+    Create a folder called `CosmosDB` and add a file `CosmosDBInterop.cs` to it.
+
+    Add the following code for the interop:
 
     ```cs
+    using Azure.Storage.Blobs;
+    using Microsoft.Azure.Cosmos;
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text;
+    using System.Threading.Tasks;
 
+    namespace DataProcessingFunctions.CosmosDB
+    {
+        public class CosmosDBInterop
+        {
+            private readonly string _connectionString;
+            public CosmosDBInterop(string cnstr) { 
+                _connectionString = cnstr;
+            }
+
+            public async Task<bool> UpsertMovie(string dbName, string containerName, MovieToWatch m)
+            {
+                using (CosmosClient client = new CosmosClient(_connectionString))
+                {
+                    var db = client.GetDatabase(dbName);
+                    var container = db.GetContainer(containerName);
+
+                    var movieDoc = await container.UpsertItemAsync(m);
+
+                    return movieDoc != null;
+                }
+            }
+        }
+    }
+    ```  
+
+    Note that this is very simple code and not at all complete.  One thing you would want to do is ensure you aren't just upserting new items because if the item exists by title you would get the document and use it's id, not the new Guid.  For this training, just getting the initial upsert working is considered a success.
+
+1. Get the parsed data into Comsos DB
+
+    For this next code, you'll put the movie into Cosmos DB.  Start by creating a method to upsert each movie into the correct container.  In this method, note that a new object called `MovieToWatch` is used, because you must pass a string `id` to the cosmos db on create/upsert:
+
+    ```cs
+    /// <summary>
+    /// Process Movies to watch
+    /// </summary>
+    /// <param name="movies">The movies to upsert into Cosmos</param>
+    /// <param name="log">The Logger object</param>
+    private static async Task ProcessMoviesToWatch(List<Movie> movies, ILogger log) 
+    {
+        var cnstr = Environment.GetEnvironmentVariable("CosmosMoviesDBConnection");
+        var cdi = new CosmosDBInterop(cnstr);
+
+        //database
+        var dbName = Environment.GetEnvironmentVariable("CosmosMoviesDatabaseName");
+
+        //cosmosMoviesToWatchContainer
+        var containerName = Environment.GetEnvironmentVariable("cosmosMoviesToWatchContainer");
+
+        foreach (var m in movies) 
+        {
+            var movieToWatch = new MovieToWatch()
+            {
+                MovieId = m.Id,
+                Rating = m.Rating,
+                Review = m.Review,
+                Title = m.Title,
+                Year = m.Year,
+                id = Guid.NewGuid().ToString()
+            };
+            var success = await cdi.UpsertMovie(dbName, containerName, movieToWatch);
+            string message = success ? $"Movie {m.Title} was upserted into CosmosDB {dbName}.{containerName}"
+                                        : $"Movie {m.Title} could not be added to the database";
+
+            log.LogInformation(message);
+        }
+    }
     ```
 
     Finish this operation by making a call to the method to process all the movies
@@ -196,11 +273,90 @@ The connection string for the Storage Account should already be available via th
     ProcessMoviesToWatch(moviesToWatch, log);
     ```  
 
+    >**Reminder:** If you are uncertain about the code as per above, review the solution files in the repository.
+
 1. Add the missing container information to the function app
 
     In the code above, two settings were leveraged, and they need to be added to the function app
 
     - `uploadsStorageContainer`: The name of the storage container where you are uploading files (i.e. `moviestowatch`)
+    - `cosmosMoviesDatabaseName`: The name of the database that will be storing the data (i.e. `moviesdb`)
     - `cosmosMoviesToWatchContainer`: The name of the container in cosmos db where you want to push data (i.e. `moviestowatch`)
+    
+    !["Make sure to add the configuration settings"](./images/Walkthrough05/image0001x-configurationsettings.png)
+  
+## Publish and Test 
 
-    !["Make sure to add the configuration settings"](./images/Walkthrough05/image0001x-configurationsettings.png)  
+This is probably a good time to publish the code and test to make sure everything is working before wiring up the automation.
+
+1. Publish the code changes to the Azure Function App
+
+    Right-click and publish or use your CI/CD to publish the function app into your Azure Function App.
+
+1. Open the storage account and upload the sample file for movies to watch.
+
+    The file is included with the solution and in the Resources folder in the root of the repository.
+
+    >**Note:** For simplicity, this is the same structure and file as for the watched movies.  Of course in the real world you can have different files and objects, with different fields.  You would just need to refactor the processor to handle the fields appropriately.
+    
+1. Once the file is uploaded, get the URL for the blob
+
+    You can get the URL even though you can't access it.  Just open the blob in the portal and copy the URL.
+    
+    !["The storage account with the container for movies to watch and the upload is shown, with the cursor on the copy link"](./images/Walkthrough05/image0002-gettingtheurloftheupload.png) 
+
+    The url should be something like (but not exactly like) this:
+
+    ```text
+    https://fileuploadso72mcy566quke.blob.core.windows.net/moviestowatch/MoviesToWatch.xlsx
+    ```  
+
+    >**Reminder:** That is an example, your link will definitely be a bit different, at least in the account name.
+
+1. Open the function to Code/Test in the portal
+
+    Navigate to the function and open the Code/Test blade, select `Test/Run`, then enter the JSON in the body to send the url:
+
+    ```json
+    {
+        "url":"https://fileuploadso72mcy566quke.blob.core.windows.net/moviestowatch/MoviesToWatch.xlsx"
+    }
+    ```  
+
+    >**Note:** use your url of course
+
+    !["Testing the function from the portal"](./images/Walkthrough05/image0003-testingandrunningthefunction.png)  
+
+    Validate that the output shows success:
+
+    !["Monitor logs show the output as successful"](./images/Walkthrough05/image0004-processingfortestingwascompleted.png)  
+
+    Validate that the data is in the Cosmos DB
+
+    !["The data is in the cosmos db table as expected"](./images/Walkthrough05/image0005-dataisinplace.png)  
+
+1. Once the working code is validated, you won't need to make any further changes to the Azure Function App.
+
+    You can close the code at this point as everything else will be done in Azure.  
+
+## Wire up the automation for Event and Processing
+
+Now that the project is ready to respond with a Function App that has been tested and proven to be able to manually interact with blob storage and the cosmos DB, you are ready to create a trigger and post event.
+
+There are a number of ways you can do this.  For learning purposes, the approach here will be to utilize a logic app to respond to the event and then create a POST with the body holding the blob storage URL.
+
+### Create an Event that Triggers a Logic App
+
+To create the logic app, you'll need to have the storage account name and primary key available.  You'll also need to sign in and authorize the Event with your user id (there are other ways to authorize but this is the easiest by far).
+
+1. Create the Logic App based on a Storage Upload Created Event trigger.
+
+1. Change the logic app to get the data url
+
+1. Post to the azure function endpoint with the payload of the url 
+
+1. Drop a file and see that it is all working
+
+## Conclusion
+
+This wraps up the look at automating events for handling files that are dropped into Azure Storage and then parsing the file with an Azure Function and pushing the data into a Cosmos DB table.
