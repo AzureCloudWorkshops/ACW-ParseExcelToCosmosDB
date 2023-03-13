@@ -2,13 +2,13 @@
   <PropertyGroup>
     <TargetFrameworkVersion>net6.0</TargetFrameworkVersion>
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
-    <AzureStorageBlobsVersion>12.15.0</AzureStorageBlobsVersion>
-    <CosmosDBVersion>3.32.1</CosmosDBVersion>
     <NETSdkFunctionsVersion>4.1.3</NETSdkFunctionsVersion>
+    <CosmosDBVersion>3.32.1</CosmosDBVersion>
     <OpenXMLVersion>2.19.0</OpenXMLVersion>
     <WebJobsExtensionsCosmosDBVersion>3.0.10</WebJobsExtensionsCosmosDBVersion>
     <WebJobsExtensionsEventGridVersion>3.2.1</WebJobsExtensionsEventGridVersion>
     <WebJobsExtensionsStorageVersion>5.0.1</WebJobsExtensionsStorageVersion>
     <ExtensionsConfigurationUserSecretsVersion>6.0.1</ExtensionsConfigurationUserSecretsVersion>
+    <AzureStorageBlobsVersion>12.15.0</AzureStorageBlobsVersion>
   </PropertyGroup>
 </Project>

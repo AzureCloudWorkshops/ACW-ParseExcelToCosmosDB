@@ -11,11 +11,12 @@ namespace DataProcessingFunctions.CosmosDB
     public class CosmosDBInterop
     {
         private readonly string _connectionString;
-        public CosmosDBInterop(string cnstr) { 
+        public CosmosDBInterop(string cnstr)
+        {
             _connectionString = cnstr;
         }
 
-        public async Task<bool> UpsertMovie(string dbName, string containerName, MovieToWatch m)
+        public async Task<bool> UpsertMovie(string dbName, string containerName, Movie m)
         {
             using (CosmosClient client = new CosmosClient(_connectionString))
             {

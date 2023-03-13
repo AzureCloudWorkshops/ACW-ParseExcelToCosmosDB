@@ -12,7 +12,7 @@ Assuming you have completed the other parts of this workshop, you should already
 
 - A storage account for file uploads
 - Two containers in the account, one for `watchedmovies` and another for `moviestowatch`
-- An event subscription that is filtered to the ``watchedmovies` container and triggers the function `ParseExcelToCosmosWithBindings` in the function app.
+- An event subscription that is filtered to the `watchedmovies` container and triggers the function `ParseExcelToCosmosWithBindings` in the function app.
 - Settings on the function app to have a connection string to the storage account for uploads as well as the cosmos db account (these are critical in this walkthrough).
 - Cosmos DB with two containers, one for `watchedmovies` and another for `moviestowatch` in the `moviesdb` database.
 
@@ -26,17 +26,23 @@ For this walkthrough, you'll need the following information handy:
 
 You will also need to be able to modify code for the function app, either in VSCode or Visual Studio if you want to manually work through the code in this walkthrough.
 
-If you are limited in resources or don't have this environment, or you just want to validate that your code is correct, you can grab the solution files and deploy them, where all the code is implemented correctly.
+If you are limited in resources or don't have a useable  environment, or if you just want to validate that your code is correct, you can grab the solution files and deploy them. The solution files contain all the code and it is implemented correctly.
 
->**Note:** Because the code to work with the SDKs is more involved, there are a significant number of code changes necessary to complete this walkthrough.
+>**Note:** Because the code to work with the SDKs is more involved, there are a significant number of code changes necessary to complete this walkthrough within the Azure Function App.  You'll also need to understand a bit about how JSON works to parse out the data to get the URL in the Logic App.
 
 ## Creating the Storage Account Interaction
 
 To get started, the first step is to be able to get files from an Azure Storage Account via the Storage Account Connection string.
 
-If you are storing this in your GitHub, remember to never put your connection string directly in the appsettings.json file, instead, use a usersecrets.json file.
+If you are storing this code in your GitHub, remember to never put your connection string directly in the `appsettings.json` file, instead, use a `secrets.json` file by utilizing the `Manage User Secrets` option in your .NET project.
 
-The connection string for the Storage Account should already be available via the configuration blade on the function app.  For this reason, leverage the key exactly in the same manner when retrieving from secrets (unless you want to create a duplicate entry for the connection string on the Function App).  
+The connection string for the Storage Account should already be available via the configuration blade on the Function App.  
+
+For this reason, you will leverage the key exactly in the same manner when retrieving from the secrets file (unless you want to create a duplicate entry for the connection string on the Function App).  
+
+Whereas typically you'd use a hierarchical approach like `StorageAccount:ConnectionString`, this walkthrough will just leverage the existing `uploadsStorageConnection` entry created earlier.  The same will follow for the Cosmos DB connection utilizing the existing entry for `CosmosMoviesDBConnection`.
+
+>**Note:** Additional settings you will encounter in the upcoming code will be added later.  Do not worry if you see code that leverages a setting you have not yet created; you'll get a chance to rectify that before you test the functionality.
 
 1. Noting the original functionality
 
@@ -44,11 +50,13 @@ The connection string for the Storage Account should already be available via th
 
     This code will need to do the same thing via the SDK and then leverage the same tools as before in the function app to do the rest of the work.
 
-    To get this solution to work, the return value from the blob storage interop will be a byte[] and then the function will just leverage the same code to parse the file from there.
+    To get this solution to work, the return value from the blob storage interop is a byte[] and the code for the function will just leverage the same code to parse the file from the byte[].
 
 1. Compose the Account -> Container -> BlobClient
 
-    Everything in Azure land is a hierarchy, and when you write code against it, you follow that hierarchy.  For this solution, we have a Storage Account -> Container -> Blob hierarchy.
+    Everything in Azure-land is a hierarchy, and when you write code against it, you follow that hierarchy.  This pattern holds true for both Storage and the Cosmos DB interactions.  
+    
+    For this solution, we have a Storage Account -> Container -> Blob hierarchy.
 
     First the code must connect to the account, then compose the container client, then use the BlobClient to get the blob as a stream.
 
@@ -89,17 +97,19 @@ The connection string for the Storage Account should already be available via th
     }
     ```  
 
-    >**Note:** This client will only get blobs, not upload them, but you could use this logic as a starter to learn more about working with Blob Storage via the SDK if you so desired.
+    >**Note:** This client will only get blobs, not upload them, but you could use this logic as a starter to learn more about working with Blob Storage via the SDK if you so desired. 
+
+    You can also find more information in this quickstart document from Microsoft Learn [https://learn.microsoft.com/azure/storage/blobs/storage-quickstart-blobs-dotnet?WT.mc_id=AZ-MVP-5004334](https://learn.microsoft.com/azure/storage/blobs/storage-quickstart-blobs-dotnet?WT.mc_id=AZ-MVP-5004334)  
 
     Additional Note:
 
-    >**Note:** There is no testing here.  If you are concerned about testing, you could create a simple console app and leverage the code to see it working rather than try to shoehorn code into a function app before you are certain that it works.
+    >**Note:** There is no testing done in this project, including no unit tests.  If you are concerned about testing, you could create a simple console app and leverage the code to see it working rather than try to shoehorn code into a function app before you are certain that it works.  You can also try to run the functions locally and use cURL or PostMan to interact with your function app locally.
 
-    Finally, you could just wire this up in the function and avoid the double memory stream byte array jazz.  I moved it to the interop/helper file so that it could potentially be reused.
+    Finally, you could just wire this Storage Account code up in the Function (instead of in a helper class) and avoid the double memory stream byte array jazz.  I moved it to the interop/helper file so that it could potentially be reused by other functions in the future.
 
 1. Add the Azure Blob Storage library
 
-    To make this code work, you need to have the NuGet Package `Azure.Storage.Blobs`.  Make sure to import that package into your project if it's not already there.
+    To make this code work, you need to have the NuGet Package `Azure.Storage.Blobs`.  Make sure to import that package into your project if it's not already there (this should already be included in the starter and solution files).
 
 1. Add a function to get the blob
 
@@ -153,7 +163,7 @@ The connection string for the Storage Account should already be available via th
     }
     ```  
 
-    Once the method is in place, add a simple command to the main processor function to get the file bytes:
+    Once the method is in place, add a simple command to the main processor function to get the file as a byte[]:
 
     ```cs
     //Interface with Storage SDK to get data by URL/keys from Azure Storage
@@ -164,7 +174,7 @@ The connection string for the Storage Account should already be available via th
 
 1. Parse the file.
 
-    The code to parse the file is already in place.  Make a call similar to the way the bindings function called to the parsefile to parse the byte[] and create a list of movie objects:
+    The code to parse the file is already in place.  Make a call similar to the way the `ParseExcelToCosmosWithBindings` function called to the ParseFile.ParseDataFile` code to parse the byte[] and create a list of movie objects:
 
     ```cs
     //Parse the file after downloading from storage
@@ -181,7 +191,7 @@ The connection string for the Storage Account should already be available via th
     }
     ```  
 
-    The movies list will then be able to be processed into the Cosmos DB database.
+    The movies list will then be able to be processed into the Cosmos DB database manually from your Function App.
 
 1. Add the Cosmos DB Interop
 
@@ -207,7 +217,7 @@ The connection string for the Storage Account should already be available via th
                 _connectionString = cnstr;
             }
 
-            public async Task<bool> UpsertMovie(string dbName, string containerName, MovieToWatch m)
+            public async Task<bool> UpsertMovie(string dbName, string containerName, Movie m)
             {
                 using (CosmosClient client = new CosmosClient(_connectionString))
                 {
@@ -223,11 +233,13 @@ The connection string for the Storage Account should already be available via th
     }
     ```  
 
-    Note that this is very simple code and not at all complete.  One thing you would want to do is ensure you aren't just upserting new items because if the item exists by title you would get the document and use it's id, not the new Guid.  For this training, just getting the initial upsert working is considered a success.
+    >**Note:** The `CosmosDBInterop` class could be further modified to query and work with the data in the future, including further massaging of the data before insert.  For now, just getting the data into Cosmos is the main goal.
 
 1. Get the parsed data into Comsos DB
 
-    For this next code, you'll put the movie into Cosmos DB.  Start by creating a method to upsert each movie into the correct container.  In this method, note that a new object called `MovieToWatch` is used, because you must pass a string `id` to the cosmos db on create/upsert:
+    For this next code, you'll put the movie into Cosmos DB.  
+    
+    Start by creating a method to upsert each movie into the correct container.  In this method, you'll create the new Movie and upsert it via code:
 
     ```cs
     /// <summary>
@@ -245,17 +257,18 @@ The connection string for the Storage Account should already be available via th
 
         //cosmosMoviesToWatchContainer
         var containerName = Environment.GetEnvironmentVariable("cosmosMoviesToWatchContainer");
+        log.LogInformation($"Database {dbName} -> Container {containerName}");
 
         foreach (var m in movies) 
         {
-            var movieToWatch = new MovieToWatch()
+            var movieToWatch = new Movie()
             {
-                MovieId = m.Id,
+                MovieId = m.MovieId,
                 Rating = m.Rating,
                 Review = m.Review,
                 Title = m.Title,
                 Year = m.Year,
-                id = Guid.NewGuid().ToString()
+                id = m.id
             };
             var success = await cdi.UpsertMovie(dbName, containerName, movieToWatch);
             string message = success ? $"Movie {m.Title} was upserted into CosmosDB {dbName}.{containerName}"
@@ -339,6 +352,10 @@ This is probably a good time to publish the code and test to make sure everythin
 
     You can close the code at this point as everything else will be done in Azure.  
 
+1. Duplication Prevented
+
+    One last note is that once again with the use of the `id` that is a pre-assigned GUID along with the `Title` as the partition key, you don't have to worry about duplicates getting inserted with the Upsert functionality just making sure any data would be updated or new records would be inserted.
+    
 ## Wire up the automation for Event and Processing
 
 Now that the project is ready to respond with a Function App that has been tested and proven to be able to manually interact with blob storage and the cosmos DB, you are ready to create a trigger and post event.

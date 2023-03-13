@@ -30,17 +30,17 @@ namespace DataProcessingFunctions
             if (string.IsNullOrWhiteSpace(url))
             {
                 log.LogError("Cannot proceed without a URL");
-                throw new Exception("No URL Provided");
             }
-            
-            log.LogInformation($"Processing file from {url}...");
-            
-            //TODO:
-            //Interface with Storage SDK to get data by URL/keys from Azure Storage
+            else
+            {
+                log.LogInformation($"Processing file from {url}...");
+            }
 
-            //Parse the file after downloading from storage
+            //TODO: Interface with Storage SDK to get data by URL/keys from Azure Storage
 
-            //Interface with Cosmos DB to manually push the documents into Cosmos
+            //TODO: Parse the file after downloading from storage
+
+            //TODO: Interface with Cosmos DB to manually push the documents into Cosmos
 
             return new OkObjectResult("Processing of movies to watch is completed");
         }
