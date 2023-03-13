@@ -70,7 +70,7 @@ To get started, copy the starter files to a working location on your machine and
         IAsyncCollector<Movie> movieDocuments,
     ```  
 
-    The Cosmos DB binding is pointing to a database named `moviesdb` on the database `moviesdb` and the collection (container) for `watchedmovies`.  Note the important connection string setting `CosmosMoviesDBConnection` and the movieDocuments that will be the data to write to cosmos.  The key pieces are:
+    The Cosmos DB binding is pointing to a database named `moviesdb` on the database `moviesdb` and the collection (container) for `watchedmovies`.  Note the important connection string setting `CosmosMoviesDBConnection` and the `movieDocuments` that will be the data to write to cosmos.  The key pieces are:
 
     - the name of the db and collection which are pre-created
     - the connection string setting `CosmosMoviesDBConnection`
@@ -131,6 +131,10 @@ The function is in place, but you can review it to see how the code will call th
 The function to parse will utilize the code to parse out the columns and build a list of movies.  The list of movies will then be published to cosmos db using the output binding.
 
 The best news is you don't have to do anything else code-wise and the solution will just work (the SDK plumbing code is not necessary when you are using bindings)
+
+**Note**: One callout here is the addition of an id Guid and a MovieId in the spreadsheet as well as the parsing.  Your data in a normal export might not have this.  The reason this is here is to allow point reads and utilizing the combination of the `id` string (a random Guid) and the `Title` as the partition.  This will prevent duplicates as well if the data is re-uploaded
+
+The reason I wanted to call that out is again just because you might need to massage the export with a random Guid as an `id` string to be used by Cosmos so that you won't duplicate data if the export is happening daily or to prevent duplicates in the event of partial function failure.
 
 ## Conclusion
 
