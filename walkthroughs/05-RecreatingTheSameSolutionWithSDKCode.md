@@ -23,6 +23,7 @@ For this walkthrough, you'll need the following information handy:
 1) The names as they exist exactly for:
     - The storage container for `moviestowatch`
     - The Cosmos DB database container for `moviestowatch`
+1) An event subscription with a Logic App already deployed and ready for modification
 
 You will also need to be able to modify code for the function app, either in VSCode or Visual Studio if you want to manually work through the code in this walkthrough.
 
@@ -355,25 +356,145 @@ This is probably a good time to publish the code and test to make sure everythin
 1. Duplication Prevented
 
     One last note is that once again with the use of the `id` that is a pre-assigned GUID along with the `Title` as the partition key, you don't have to worry about duplicates getting inserted with the Upsert functionality just making sure any data would be updated or new records would be inserted.
-    
-## Wire up the automation for Event and Processing
 
-Now that the project is ready to respond with a Function App that has been tested and proven to be able to manually interact with blob storage and the cosmos DB, you are ready to create a trigger and post event.
+1. Modify the logic app created in step 3
 
-There are a number of ways you can do this.  For learning purposes, the approach here will be to utilize a logic app to respond to the event and then create a POST with the body holding the blob storage URL.
+    In this next part, you will modify the Logic App created at the start of the Walkthrough for step 3.
 
-### Create an Event that Triggers a Logic App
+    If you did not do that, then the easiest solution is to just create a new storage account and then add a new Logic App to that new storage account.  
 
-To create the logic app, you'll need to have the storage account name and primary key available.  You'll also need to sign in and authorize the Event with your user id (there are other ways to authorize but this is the easiest by far).
+    Another solution is to delete the event subscription from step 3 for the event triggered function and just start fresh on the existing account.  Either way, you can get back to the default state of no subscriptions and follow the steps in Walkthrough 3 to wire up the default Logic App.
 
-1. Create the Logic App based on a Storage Upload Created Event trigger.
+1. Get the File URL from the Event Data
 
-1. Change the logic app to get the data url
+    The event data is the same whether it is going to a Function App or a Logic App.
 
-1. Post to the azure function endpoint with the payload of the url 
+    You could leverage the logs in the Azure Function monitoring from the previous runs, or you can just trigger the Logic App.
 
-1. Drop a file and see that it is all working
+    Drill into the `Event Subscription` for the storage account to the Logic App, and modify the `Subject Begins With` filter to the following
+
+    ```text
+    /blobServices/default/containers/moviestowatch
+    ```  
+
+    Then modify the subject ends with to
+
+    ```text
+    .xlsx
+    ```  
+
+    !["Updating the Logic App subscription filter"](./images/Walkthrough05/image0006-updatefilter.png)  
+
+    This is the same thing you did for the other event subscription earlier.
+
+    >**Note:** Make sure to save the changes to deploy the event subscription with the filter.
+
+    Now upload the file again to the `moviestowatch` container to trigger the event that is wired up to launch the Logic App.
+
+    Either way, once you've triggered the Logic App, you can review it by drilling into the Logic App runs:
+
+    !["Reviewing the run of the logic app shows the data has the URL as expected](./images/Walkthrough05/image0007-eventdatacapturedinlogicapphistory.png)  
+
+1. Parse out the Event Data URL into a variable
+
+    This is not the most efficient but will show what needs to be done.
+
+    Create a new `Initialize Variable` action in the logic app designer:
+
+    !["Creating a new variable"](./images/Walkthrough05/image0008-initializevariable.png)  
+
+    Name the Action:
+
+    ```text
+    Create the Body to Trigger the Function
+    ```  
+
+    Set the name to:
+
+    ```text
+    TriggerBody
+    ```
+
+    Set the type to `String`
+
+    Then add the Value as
+
+    ```text
+    "{`url`:``}"
+    ``` 
+
+    Replace the empty value text in that string with the Expression for the `Event Data`:
+
+    !["Adding the values to the variable"](./images/Walkthrough05/image0009-addingvalues.png)  
+
+    Save your changes.
+
+1. Open the Logic App Code View to modify the data
+
+    The Event Data is not the correct value.  Instead, we really want to send the Event Data ".url" part to the function app.
+
+    In the code view, find the JSON where it says:
+
+    ```json
+    "value": "\"{ 'url':'@{triggerBody()?['data']}'}\""
+    ```
+
+    Change this value to:
+
+    ```json
+    "value": "{ 'url':'@{triggerBody()?['data']['url']}'}"
+    ```
+
+    Save the changes and return to the Logic App Designer view.  You should now see the following:
+
+    !["The data.url is now the value as expected"](./images/Walkthrough05/image0010.png)  
+
+    Upload the spreadsheet to trigger the logic app again and make sure this value is set as expected in the review of the executed run:
+
+    !["Data.Url is retrieved into the variable"](./images/Walkthrough05/image0011-theURLValueIsSetAsExpected.png)  
+
+
+1. Get the function key
+
+    Navigate to your Function App and get the Function Key to trigger the SDK Function:
+
+    !["The Function Key is easily retrieved"](./images/Walkthrough05/image0012-getfunctionkey.png)  
+
+1. Compose the Post to the Azure Function endpoint with the payload of the url
+
+    Add another action for HTTP Post to the Logic app.
+
+    Set the URL to the function execution endpoint retrieved above, something like:
+
+    ```https
+    https://dataprocessingfunctionso72mcy566quke.azurewebsites.net/api/ParseExcelToCosmosWithSDKs?code=...==
+    ```  
+
+    Set the Body to the variable created in the previous step:
+
+    !["The variable is leveraged and the URI is set for the post action"](./images/Walkthrough05/image0013.png)  
+
+1. Optional - delete all the records from the `movies to watch` collection in Cosmos
+
+    If you want to, you can clean up the container.
+
+    You will be able to see the execution once the trigger fires so this is optional.
+
+1. Drop a file into storage to validate that it is all working as expected
+
+    With everything in place, upload the file again.
+
+    Validate that it worked as expected:
+
+    !["Worked as expected"](./images/Walkthrough05/image0014-logshowstheexectuionwassuccessful.png)  
+
+    And the function shows that it executed:
+
+    !["Function Monitor shows the log as expected"](./images/Walkthrough05/image0015-monitorrecordedthefunctionexectuion.png)  
+
 
 ## Conclusion
 
 This wraps up the look at automating events for handling files that are dropped into Azure Storage and then parsing the file with an Azure Function and pushing the data into a Cosmos DB table.
+
+You've now seen how to process the events either from a direct trigger with bindings or via some custom automation.
