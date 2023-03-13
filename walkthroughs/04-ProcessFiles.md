@@ -58,7 +58,9 @@ Additionally, uploading anything to the `moviestowatch` container should not tri
 
 ## Rinse and Repeat
 
-Feel free to upload the file again (you will get duplicates since the id is generated and is different for each load, and no prevention of duplicates is in place on the Title).  Feel free to change the data and upload and you'll get the expected results when data is unique.
+Feel free to upload the file again.  Due to the use of the `id` you should not get any duplicates on the upload of the data.  
+
+Again, this is important enough to note that you might have to massage your data if you have a regular export that relies on a typical integer `Id` field without the string GUID `id` that is in the sample data.  Once again, the "id" as a random GUID helps to map the data in Cosmos with the "id" and the partition of "Title" to create easy access to your data and the ability to execute the upload multiple times without duplication of data.
 
 ## Conclusion
 
@@ -66,6 +68,6 @@ This is the end of the first part of the workshop.  You now have the basic tools
 
 You also learned how to use event subject filtering so that the uploaded file will create an event only when in the correct folder and with the correct extension.
 
-In this specific example, you learned how to then get the blob and parse it as an Excel file to put the data into CosmosDB.  There are many other ways you can utilize this process, of course.
+In this specific example, you learned how to then get the blob and parse it as an Excel file to put the data into CosmosDB.  There are many other ways you can utilize this process, of course, but hopefully you now have the tools in your belt to make this happen.
 
-In the final walkthrough (which is optional), you can see a more manual approach to this same type of operation.
+In the final walkthrough (which is optional and redundant), you can see a more manual approach to this same type of operation, where you'll utilize the SDKs and an HTTP trigger on the second function.
