@@ -96,3 +96,4 @@ namespace DataProcessingFunctions.ParseExcel
             return sampleData;
         }
     }
+}
