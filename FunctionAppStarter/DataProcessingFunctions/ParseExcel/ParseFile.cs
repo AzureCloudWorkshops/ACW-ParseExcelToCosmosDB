@@ -17,10 +17,7 @@ namespace DataProcessingFunctions.ParseExcel
 
             var sampleData = new List<Movie>();
 
-            string text;
-            int index;
             string columnRef;
-            bool success;
 
             using (SpreadsheetDocument spreadsheetDocument = SpreadsheetDocument.Open(fileStreamInMemory, false))
             {
@@ -55,26 +52,30 @@ namespace DataProcessingFunctions.ParseExcel
                         switch (columnRef)
                         {
                             case "A":
-                                //ID
+                                //id
+                                nextMovie.id = dataString;
+                                break;
+                            case "B":
+                                //MovieId
                                 var isId = int.TryParse(dataString, out int id);
                                 if (isId && id > 0)
                                 {
-                                    nextMovie.Id = id;
+                                    nextMovie.MovieId = id;
                                 }
                                 break;
-                            case "B":
+                            case "C":
                                 //Title
                                 nextMovie.Title = dataString;
                                 break;
-                            case "C":
+                            case "D":
                                 //Rating
                                 nextMovie.Rating = dataString;
                                 break;
-                            case "D":
+                            case "E":
                                 //Review
                                 nextMovie.Review = dataString;
                                 break;
-                            case "E":
+                            case "F":
                                 //year
                                 var isYear = int.TryParse(dataString, out int year);
                                 if (isYear && year > 0)
@@ -85,7 +86,7 @@ namespace DataProcessingFunctions.ParseExcel
                         }
                     }
 
-                    if (nextMovie.Id > 0)
+                    if (!string.IsNullOrWhiteSpace(nextMovie.id) && nextMovie.MovieId > 0)
                     {
                         sampleData.Add(nextMovie);
                     }
@@ -95,4 +96,3 @@ namespace DataProcessingFunctions.ParseExcel
             return sampleData;
         }
     }
-}
