@@ -145,7 +145,7 @@ Whereas typically you'd use a hierarchical approach like `StorageAccount:Connect
         //Parse the file after downloading from storage
         var keyText = $@"/{containerName}/";
         var blobNameStart = url.IndexOf(keyText);
-        var blobName = url.Substring(blobNameStart + keyText.Length + 1);
+        var blobName = url.Substring(blobNameStart + keyText.Length);
         if (string.IsNullOrWhiteSpace(blobName))
         {
             log.LogError("Blob Name not found");
@@ -420,13 +420,11 @@ This is probably a good time to publish the code and test to make sure everythin
     Then add the Value as
 
     ```text
-    "{`url`:``}"
+    { "url" : "" }
     ``` 
 
-    Replace the empty value text in that string with the Expression for the `Event Data`:
-
-    !["Adding the values to the variable"](./images/Walkthrough05/image0009-addingvalues.png)  
-
+    Replace the empty value text in that string with the Expression for the `Event Data`.
+    
     Save your changes.
 
 1. Open the Logic App Code View to modify the data
