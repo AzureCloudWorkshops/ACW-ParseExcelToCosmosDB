@@ -2,7 +2,7 @@
 
 To get started, there are starter and solution files available for your use in the repository.  If you download or fork the code you can use the starter project with this document.  If you just want to have the solution in place, deploy the completed solution.
 
->**Note**: If you deploy the completed solution, you will still need to wire up the configuration information for the input and output bindings.
+>**Note**: If you deploy the completed solution, you will still need to wire up the configuration information for the input and output bindings.  
 
 ## Open the Starter Files
 
