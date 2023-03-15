@@ -12,6 +12,12 @@ This workshop utilizes the following Azure Services
 - Azure Cosmos DB
 - Azure Logic Apps (optional/additional training)
 
+## Architecture Diagram
+
+The following architecture will be built during this workshop:
+
+!["The overall architecture diagram"](./walkthroughs/images/parseExcelToCosmos.png)  
+
 ## Code Packages
 
 To make this process happen, a couple of code libraries need to be utilized.  

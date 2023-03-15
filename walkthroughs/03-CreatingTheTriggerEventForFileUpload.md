@@ -91,7 +91,7 @@ For the Function App trigger, the `best` way I've found is to manually add an ev
     Save the logic app and name it something like:
 
     ```text
-    ProcessUploadToCosmosSDKFunctionApp
+    ProcessUploadToCosmosSDKLogicApp
     ```  
 
     >**Note:** You only get one chance to name a Logic App so be certain of your naming before saving.
