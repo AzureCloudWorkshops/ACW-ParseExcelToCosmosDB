@@ -218,6 +218,7 @@ Whereas typically you'd use a hierarchical approach like `StorageAccount:Connect
                 _connectionString = cnstr;
             }
 
+            //original video code follows:
             public async Task<bool> UpsertMovie(string dbName, string containerName, Movie m)
             {
                 using (CosmosClient client = new CosmosClient(_connectionString))
@@ -229,6 +230,27 @@ Whereas typically you'd use a hierarchical approach like `StorageAccount:Connect
 
                     return movieDoc != null;
                 }
+            }
+
+            //new code added after video recording for better execution
+            public async Task<bool> UpsertMovies(string dbName, string containerName, List<Movie> movies)
+            {
+                bool success = true;
+                using (CosmosClient client = new CosmosClient(_connectionString))
+                {
+                    var db = client.GetDatabase(dbName);
+                    var container = db.GetContainer(containerName);
+
+                    foreach (var m in movies) 
+                    {
+                        var movieDoc = await container.UpsertItemAsync(m);
+                        if (movieDoc is null) 
+                        { 
+                            success= false; 
+                        }
+                    }
+                }
+                return success;
             }
         }
     }
@@ -248,7 +270,7 @@ Whereas typically you'd use a hierarchical approach like `StorageAccount:Connect
     /// </summary>
     /// <param name="movies">The movies to upsert into Cosmos</param>
     /// <param name="log">The Logger object</param>
-    private static async Task ProcessMoviesToWatch(List<Movie> movies, ILogger log) 
+    private static async Task ProcessMoviesToWatch(List<Movie> movies, ILogger log)
     {
         var cnstr = Environment.GetEnvironmentVariable("CosmosMoviesDBConnection");
         var cdi = new CosmosDBInterop(cnstr);
@@ -260,7 +282,9 @@ Whereas typically you'd use a hierarchical approach like `StorageAccount:Connect
         var containerName = Environment.GetEnvironmentVariable("cosmosMoviesToWatchContainer");
         log.LogInformation($"Database {dbName} -> Container {containerName}");
 
-        foreach (var m in movies) 
+        //original video code (do not use, only left this so that you can review the difference):
+        /*
+        foreach (var m in movies)
         {
             var movieToWatch = new Movie()
             {
@@ -277,6 +301,15 @@ Whereas typically you'd use a hierarchical approach like `StorageAccount:Connect
 
             log.LogInformation(message);
         }
+        */
+
+        //updated after video walk through to just push all the movies at once:
+        var success = await cdi.UpsertMovies(dbName, containerName, movies);
+
+        string message = success ? $"All movies to watch upserted into CosmosDB {dbName}.{containerName}"
+                                    : $"Not all movies could be pushed into the database";
+
+        log.LogInformation(message);
     }
     ```
 
@@ -284,7 +317,7 @@ Whereas typically you'd use a hierarchical approach like `StorageAccount:Connect
 
     ```cs
     //Interface with Cosmos DB to manually push the documents into Cosmos
-    ProcessMoviesToWatch(moviesToWatch, log);
+    await ProcessMoviesToWatch(moviesToWatch, log);
     ```  
 
     >**Reminder:** If you are uncertain about the code as per above, review the solution files in the repository.

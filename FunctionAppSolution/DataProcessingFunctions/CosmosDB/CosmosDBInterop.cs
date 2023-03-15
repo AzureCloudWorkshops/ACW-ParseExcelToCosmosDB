@@ -28,5 +28,26 @@ namespace DataProcessingFunctions.CosmosDB
                 return movieDoc != null;
             }
         }
+
+        public async Task<bool> UpsertMovies(string dbName, string containerName, List<Movie> movies)
+        {
+            bool success = true;
+            using (CosmosClient client = new CosmosClient(_connectionString))
+            {
+                var db = client.GetDatabase(dbName);
+                var container = db.GetContainer(containerName);
+
+                foreach (var m in movies) 
+                {
+                    var movieDoc = await container.UpsertItemAsync(m);
+                    if (movieDoc is null) 
+                    { 
+                        success= false; 
+                    }
+                }
+            }
+            return success;
+        }
+
     }
 }

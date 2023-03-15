@@ -127,6 +127,8 @@ namespace DataProcessingFunctions
             var containerName = Environment.GetEnvironmentVariable("cosmosMoviesToWatchContainer");
             log.LogInformation($"Database {dbName} -> Container {containerName}");
 
+            /*
+            //do not use
             foreach (var m in movies)
             {
                 var movieToWatch = new Movie()
@@ -144,6 +146,15 @@ namespace DataProcessingFunctions
 
                 log.LogInformation(message);
             }
+            //
+            */
+            //updated after video walk through to just push all the movies at once:
+            var success = await cdi.UpsertMovies(dbName, containerName, movies);
+
+            string message = success ? $"All movies to watch upserted into CosmosDB {dbName}.{containerName}"
+                                        : $"Not all movies could be pushed into the database";
+
+            log.LogInformation(message);
         }
     }
 }
